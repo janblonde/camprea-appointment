@@ -7,31 +7,48 @@
     <style>
         body {
             margin: 0;
-            padding: 20px;
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
         
-        .container {
+        .header-banner {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .banner-content {
             max-width: 1200px;
             margin: 0 auto;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
         }
         
-        .iframe-container {
-            width: 100%;
-            height: 600px;
-            border: none;
-            display: block;
+        .site-info {
+            flex: 1;
         }
         
-        .button-container {
-            padding: 30px;
-            text-align: center;
-            background-color: #fff;
+        .site-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin: 0 0 5px 0;
+        }
+        
+        .site-description {
+            color: #666;
+            margin: 0;
+            font-size: 14px;
         }
         
         .appointment-btn {
@@ -47,6 +64,7 @@
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
             text-transform: uppercase;
             letter-spacing: 1px;
+            white-space: nowrap;
         }
         
         .appointment-btn:hover {
@@ -59,55 +77,141 @@
             transform: translateY(0);
         }
         
+        .content-container {
+            background: white;
+            margin: 0;
+            min-height: calc(100vh - 100px);
+        }
+        
+        .iframe-container {
+            width: 100%;
+            height: calc(100vh - 120px);
+            border: none;
+            display: block;
+        }
+        
+        .fallback-content {
+            padding: 40px;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .fallback-content h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .site-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .site-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
         @media (max-width: 768px) {
-            body {
-                padding: 10px;
+            .banner-content {
+                flex-direction: column;
+                text-align: center;
             }
             
-            .iframe-container {
-                height: 500px;
-            }
-            
-            .button-container {
-                padding: 20px;
+            .site-title {
+                font-size: 20px;
             }
             
             .appointment-btn {
                 padding: 12px 30px;
                 font-size: 16px;
             }
+            
+            .iframe-container {
+                height: calc(100vh - 150px);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <iframe 
-            src="https://camprea.org" 
-            class="iframe-container"
-            title="Camprea.org Website"
-            frameborder="0"
-            allowfullscreen>
-        </iframe>
-        
-        <div class="button-container">
+    <div class="header-banner">
+        <div class="banner-content">
+            <div class="site-info">
+                <h1 class="site-title">Camprea.org</h1>
+                <p class="site-description">Professional healthcare services and consultation</p>
+            </div>
             <button class="appointment-btn" onclick="handleAppointment()">
-                Make an Appointment
+                📅 Make an Appointment
             </button>
         </div>
     </div>
 
+    <div class="content-container">
+        <iframe 
+            id="siteFrame"
+            src="https://camprea.org" 
+            class="iframe-container"
+            title="Camprea.org Website"
+            frameborder="0"
+            onload="handleFrameLoad()"
+            onerror="showFallback()">
+        </iframe>
+        
+        <div id="fallbackContent" class="fallback-content" style="display: none;">
+            <h2>🏥 Welcome to Camprea.org</h2>
+            <p>This site cannot be embedded directly due to security settings, but you can visit it using the link below:</p>
+            <a href="https://camprea.org" target="_blank" class="site-link">
+                🌐 Visit Camprea.org
+            </a>
+            <p style="margin-top: 30px; color: #666;">
+                Or click the "Make an Appointment" button above to book your consultation directly.
+            </p>
+        </div>
+    </div>
+
     <script>
+        let frameLoadAttempted = false;
+        
+        function handleFrameLoad() {
+            frameLoadAttempted = true;
+            // Frame loaded successfully
+            console.log('Frame loaded successfully');
+        }
+        
+        function showFallback() {
+            document.getElementById('siteFrame').style.display = 'none';
+            document.getElementById('fallbackContent').style.display = 'block';
+        }
+        
+        // Check if frame failed to load after a timeout
+        setTimeout(() => {
+            if (!frameLoadAttempted) {
+                showFallback();
+            }
+        }, 3000);
+        
         function handleAppointment() {
-            // You can customize this function to handle the appointment booking
-            // For example, redirect to a booking page or open a modal
-            alert('Redirecting to appointment booking...');
+            // Customize this function to handle appointment booking
+            // Option 1: Show an alert with instructions
+            if (confirm('Ready to make an appointment? Click OK to visit the booking page.')) {
+                window.open('https://camprea.org', '_blank');
+            }
             
-            // Example: Open appointment page in new tab
+            // Option 2: You could integrate with a booking system
             // window.open('https://your-booking-system.com', '_blank');
             
-            // Example: Redirect current page
-            // window.location.href = 'https://your-booking-system.com';
+            // Option 3: Redirect to appointment page
+            // window.location.href = 'https://camprea.org/appointments';
         }
+        
+        // Handle iframe errors
+        document.getElementById('siteFrame').addEventListener('error', showFallback);
     </script>
 </body>
 </html>
